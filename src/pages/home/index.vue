@@ -11,12 +11,18 @@
       ></u-swiper>
     </div>
     <div class="remarks" v-if="remarks.length > 0">
-      <div class="remark" v-for="(item, index) in remarks" :key="index" @click="editRemark(index)">
-        <div class="title">第&nbsp;{{ index + 1 }}&nbsp;个</div>
-        <div class="content">{{ item }}</div>
+      <div class="remark" v-for="(item, index) in remarks" :key="index" >
+        <div class="title">
+          <span class="index">第&nbsp;{{ index + 1 }}&nbsp;个</span>
+          <div style="width: 30px;" @click="deleteRemark(index)">
+            <u-icon name="close" color="#fa3534" size="15"></u-icon>
+          </div>
+        </div>
+        <div class="content" @click="editRemark(index)">{{ item }}</div>
       </div>
     </div>
 <!--    <u-empty v-else></u-empty>-->
+    <u-modal :show="show" title="提示" confirmText="删除" confirmColor="#fa3534" content="是否确定删除该备注？" showCancelButton @cancel="show = false" @confirm="doDelete" buttonReverse></u-modal>
     <div style="height: 100px;"></div>
     <div class="bottom">
       <u-button type="primary" text="添 加" @click="goAdd"></u-button>
@@ -34,16 +40,23 @@ const list = reactive([
 ])
 let remarks = ref([])
 
+let show = ref(false)
+
+let index = -1
+
 onMounted(() => {
   // 获取数据
-  const data = uni.getStorageSync('remarks') || '[]'
-  remarks.value = JSON.parse(data)
+  doShow()
 })
 
 onShow(() => {
+  doShow()
+})
+
+function doShow() {
   const data = uni.getStorageSync('remarks') || '[]'
   remarks.value = JSON.parse(data)
-})
+}
 
 function goAdd() {
   uni.navigateTo({
@@ -55,6 +68,26 @@ function editRemark(index: number) {
   uni.navigateTo({
     url: `/pages/home/edit-remark?index=${index}`
   })
+}
+
+function deleteRemark(i: number) {
+  const data = uni.getStorageSync('remarks') || '[]'
+  const obj = JSON.parse(data)
+  if (index < obj.length) {
+    show.value = true
+    index = i
+  } else {
+    return
+  }
+}
+function doDelete () {
+  const data = uni.getStorageSync('remarks') || '[]'
+  const obj = JSON.parse(data)
+  obj.splice(index, 1)
+  console.log(obj)
+  uni.setStorageSync('remarks', JSON.stringify(obj))
+  doShow()
+  show.value = false
 }
 
 </script>
@@ -73,10 +106,15 @@ function editRemark(index: number) {
       background-color: #ffffff;
       margin-bottom: 12px;
       .title {
-        font-size: 14px;
-        color: #000000;
         padding: 12px 0 6px 12px;
-        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .index {
+          font-size: 14px;
+          color: #000000;
+          font-weight: 500;
+        }
       }
       .content {
         max-height: 95px;

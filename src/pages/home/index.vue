@@ -10,6 +10,9 @@
           bgColor="#ffffff"
       ></u-swiper>
     </div>
+    <div class="actions">
+      <u-button type="info" text="个人中心" @click="goProfile"></u-button>
+    </div>
     <div class="remarks" v-if="remarks.length > 0">
       <div class="remark" v-for="(item, index) in remarks" :key="index" >
         <div class="title">
@@ -21,7 +24,7 @@
         <div class="content" @click="editRemark(index)">{{ item }}</div>
       </div>
     </div>
-<!--    <u-empty v-else></u-empty>-->
+    <div class="empty" v-else>暂无备注信息</div>
     <u-modal :show="show" title="提示" confirmText="删除" confirmColor="#fa3534" content="是否确定删除该备注？" showCancelButton @cancel="show = false" @confirm="doDelete" buttonReverse></u-modal>
     <div style="height: 100px;"></div>
     <div class="bottom">
@@ -90,6 +93,13 @@ function doDelete () {
   show.value = false
 }
 
+function goProfile() {
+  // 前往个人中心
+  uni.navigateTo({
+    url: '/pages/profile/index'
+  })
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -98,6 +108,9 @@ function doDelete () {
   min-height: 100vh;
   background-color: $u-bg-color;
   padding: 20px 12px;
+  .actions {
+    padding-top: 12px;
+  }
   .remarks {
     padding-top: 20px;
     .remark {
@@ -128,6 +141,14 @@ function doDelete () {
         color: #333333;
       }
     }
+  }
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88px;
+    font-weight: 500;
+    font-size: 14px;
   }
   .bottom {
     height: 100px;
